@@ -14,7 +14,7 @@ Then just include the reference:
 
 To create a fraction, use the fraction constructor and provide a numerator and denominator:
 
-`let frac1 = Fraction(2, 3)`
+`let frac = Fraction(2, 3)`
 
 The `+`, `-`, `*` and `/` are all overloaded to work with this fraction type and will maintain the fraction in simplest form. In addition, the `^^` operator will take a fraction to an integer power. Supported operations were chosen on the grounds that they must guarantee an exact result, which is the purpose of this library. Any other operations such as fractional powers should be done using floating point numbers.
 
@@ -24,6 +24,6 @@ There are also methods to be called on a fraction to convert to a float (`asFloa
 
 To display a fraction to the console use:
 
-`printfn "%A" frac1`
+`printfn "%A" frac`
 
 which will present the fraction in the form *numerator/denominator*

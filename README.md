@@ -6,6 +6,10 @@ A library for arithmetic of fractions, allowing operations on non-integers witho
 
 To download and install the package download the `.nupkg` file from this repository, and set the package source to be the location of the file in the Visual Studio nuget package manager. Then click install.
 
+Then just include the reference:
+
+`open Fractions.Operations`
+
 ## Usage
 
 To create a fraction, use the fraction constructor and provide a numerator and denominator:

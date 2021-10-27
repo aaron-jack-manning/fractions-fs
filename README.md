@@ -21,3 +21,9 @@ The `+`, `-`, `*` and `/` are all overloaded to work with this fraction type and
 To extract the numerator or denominator just use `frac.Numerator` or `frac.Denominator` respectively.
 
 There are also methods to be called on a fraction to convert to a float (`asFloat`), convert to a decimal (`asDecimal`), and verify if it is a whole number (`isWhole`).
+
+To display a fraction to the console use:
+
+`printfn "%A" frac1`
+
+which will present the fraction in the form *numerator/denominator*

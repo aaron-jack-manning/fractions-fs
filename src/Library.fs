@@ -1,66 +1,73 @@
-﻿namespace Fractions
+namespace Fractions
 
 module Operations =
-    let private reduceMod modulus number =
-        (number % modulus + modulus) % modulus
-    
-    let private division a b =
-        let remainder = reduceMod b a
-        let quotient = (a - remainder)/ b
-        
-        quotient, remainder
-    
-    let rec private greatestCommonDenominator a b =
-        let quotient, remainder = division a b
-    
-        match remainder with
-        | 0 -> b
-        | _ -> greatestCommonDenominator b remainder
-    
-    let private lowestCommonMultiple a b =
-        (a * b) / (greatestCommonDenominator a b)
-
     [<StructuredFormatDisplay("{Numerator}/{Denominator}")>]
-    type Fraction(numerator, denominator) =
+    type Fraction<'a> =
+        { Numerator : 'a; Denominator : 'a}
     
-        member this.Numerator = numerator
-        member this.Denominator = denominator
+        static member inline private reduceMod modulus number =
+            (number % modulus + modulus) % modulus
     
-        static member simplify (a : Fraction) : Fraction =
-            let gcd = greatestCommonDenominator a.Numerator a.Denominator
-            
+        static member inline private division a b =
+            let remainder = Fraction<_>.reduceMod b a
+            let quotient = (a - remainder)/ b
+                
+            quotient, remainder
+    
+        static member private greatestCommonDenominator (a : 'b) (b : 'b) : 'b =
+            let quotient, remainder = Fraction<_>.division a b
+    
+            if remainder = LanguagePrimitives.GenericZero then
+                b
+            else
+                Fraction<_>.greatestCommonDenominator b remainder
+    
+        static member inline private lowestCommonMultiple a b =
+            (a * b) / (Fraction<_>.greatestCommonDenominator a b)
+    
+        static member simplify (a : Fraction<_>) : Fraction<_> =
+            let gcd = Fraction<_>.greatestCommonDenominator a.Numerator a.Denominator
+                
             let newNumerator = a.Numerator / gcd
             let newDenominator = a.Denominator / gcd
+                
+            if newDenominator < LanguagePrimitives.GenericZero then
+                { Numerator = -newNumerator; Denominator = -newDenominator}
+            else
+                { Numerator = newNumerator; Denominator = newDenominator}
+    
+        static member (/) (a : Fraction<_>, b : Fraction<_>) : Fraction<_> =
+            Fraction<_>.simplify { Numerator = a.Numerator * b.Denominator; Denominator =  a.Denominator * b.Numerator }
+        
+        static member (*) (a : Fraction<_>, b : Fraction<_>) : Fraction<_> =
+            Fraction<_>.simplify { Numerator = a.Numerator * b.Numerator; Denominator = a.Denominator * b.Denominator }
+        
+        static member (+) (a : Fraction<_>, b : Fraction<_>) : Fraction<_> =
+            Fraction<_>.simplify { Numerator = a.Numerator * b.Denominator + a.Denominator * b.Numerator; Denominator = a.Denominator * b.Denominator }
+        
+        static member (-) (a : Fraction<_>, b : Fraction<_>) : Fraction<_> =
+            Fraction<_>.simplify { Numerator = a.Numerator * b.Denominator - a.Denominator * b.Numerator; Denominator = a.Denominator * b.Denominator }
             
-            if newDenominator < 0 then
-                Fraction(-newNumerator, -newDenominator)
-            else
-                Fraction(newNumerator, newDenominator)
+        static member fromInt (integer : int) = { Numerator = bigint integer; Denominator = 1I }
+        static member fromInt64 (integer : int64) = { Numerator = bigint integer; Denominator = 1I }
+        static member fromBigint (integer : bigint) = { Numerator = integer; Denominator = 1I }
+        static member fromIntTuple (numerator : int, denominator : int) = { Numerator = bigint numerator; Denominator = bigint denominator}
     
-        static member (/) (a : Fraction, b : Fraction) : Fraction =
-            Fraction.simplify (Fraction(a.Numerator * b.Denominator, a.Denominator * b.Numerator))
-    
-        static member (*) (a : Fraction, b : Fraction) : Fraction =
-            Fraction.simplify (Fraction(a.Numerator * b.Numerator, a.Denominator * b.Denominator))
-    
-        static member (+) (a : Fraction, b : Fraction) : Fraction =
-            Fraction.simplify (Fraction(a.Numerator * b.Denominator + a.Denominator * b.Numerator, a.Denominator * b.Denominator))
-    
-        static member (-) (a : Fraction, b : Fraction) : Fraction =
-            Fraction.simplify (Fraction(a.Numerator * b.Denominator - a.Denominator * b.Numerator, a.Denominator * b.Denominator))
+        static member one = Fraction<_>.fromIntTuple (1, 1)
+        static member zero = Fraction<_>.fromIntTuple (0, 1)
         
-        static member ( ^^ ) (a : Fraction, power : int) : Fraction =
-            if power < 0 then
+        static member ( ^^ ) (a : Fraction<_>, power : int) : Fraction<_> =
+            if power < LanguagePrimitives.GenericZero then
                 let positivePower = -power
-                Fraction(pown a.Denominator positivePower, pown a.Numerator positivePower)
+                { Numerator = pown a.Denominator positivePower; Denominator = pown a.Numerator positivePower }
             else
-                Fraction(pown a.Numerator power, pown a.Denominator power)
+                { Numerator = pown a.Numerator power; Denominator = pown a.Denominator power }
         
-        member this.asFloat =
-            (float this.Numerator) / (float this.Denominator)
-    
-        member this.asDecimal =
-            (decimal this.Numerator) / (decimal this.Denominator)
+        static member asFloat (a : Fraction<_>) : float =
+            (float a.Numerator) / (float a.Denominator)
+        
+        static member asDecimal (a : Fraction<_>) : decimal =
+            (decimal a.Numerator) / (decimal a.Denominator)
               
-        member this.isWhole =
-            this.Denominator = 1
+        static member isWhole (a : Fraction<_>) : bool =
+            a.Denominator - LanguagePrimitives.GenericOne = LanguagePrimitives.GenericZero

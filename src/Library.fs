@@ -48,10 +48,12 @@ module Operations =
         static member (-) (a : Fraction<_>, b : Fraction<_>) : Fraction<_> =
             Fraction<_>.simplify { Numerator = a.Numerator * b.Denominator - a.Denominator * b.Numerator; Denominator = a.Denominator * b.Denominator }
             
-        static member fromInt (integer : int) = { Numerator = bigint integer; Denominator = 1I }
-        static member fromInt64 (integer : int64) = { Numerator = bigint integer; Denominator = 1I }
-        static member fromBigint (integer : bigint) = { Numerator = integer; Denominator = 1I }
-        static member fromIntTuple (numerator : int, denominator : int) = { Numerator = bigint numerator; Denominator = bigint denominator}
+        static member fromInt (integer : int) = { Numerator = integer; Denominator = LanguagePrimitives.GenericOne }
+        static member fromInt64 (integer : int64) = { Numerator = integer; Denominator = LanguagePrimitives.GenericOne }
+        static member fromBigint (integer : bigint) = { Numerator = integer; Denominator = LanguagePrimitives.GenericOne }
+        static member fromIntTuple (numerator : int, denominator : int) = { Numerator = numerator; Denominator = denominator }
+        static member fromInt64Tuple (numerator : int64, denominator : int64) = { Numerator = numerator; Denominator = denominator }
+        static member fromBigintTuple (numerator : bigint, denominator : bigint) = { Numerator = numerator; Denominator = denominator }
     
         static member one = Fraction<_>.fromIntTuple (1, 1)
         static member zero = Fraction<_>.fromIntTuple (0, 1)
